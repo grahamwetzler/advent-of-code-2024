@@ -1,6 +1,6 @@
-from util import get_input
+from pathlib import Path
 
-input = get_input().splitlines()
+input = Path("02/02.txt").read_text().splitlines()
 input_parsed = [[int(level) for level in report.split(" ")] for report in input]
 
 

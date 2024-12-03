@@ -1,6 +1,6 @@
-from util import get_input
+from pathlib import Path
 
-input = [int(n) for n in get_input().split()]
+input = [int(n) for n in Path("01/01.txt").read_text().split()]
 left_ids = sorted(input[::2])
 right_ids = sorted(input[1::2])
 
