@@ -7,39 +7,35 @@ def parse_input(input: str):
 
 
 def part_1(input):
-    xmas = "XMAS"
-
     def count_xmas(characters):
+        xmas = "XMAS"
         length = len(characters)
         xmas_count = 0
-        index = 0
-        while index + 4 <= length:
-            joined_characters = "".join(characters[index : index + 4])
+        for index in range(length):
+            joined_characters = "".join(characters[index : index + len(xmas)])
             if joined_characters in (xmas, xmas[::-1]):
                 xmas_count += 1
-            index += 1
 
         return xmas_count
 
-    max_col = len(input[0])
-    max_row = len(input)
-    cols = [[] for _ in range(max_col)]
-    rows = [[] for _ in range(max_row)]
-    forward_diagonal = [[] for _ in range(max_row + max_col - 1)]
-    backwards_diagonal = [[] for _ in range(len(forward_diagonal))]
-    min_backwards_diagonal = -max_row + 1
+    width = len(input[0])
+    height = len(input)
+    columns = [[] for _ in range(width)]
+    rows = [[] for _ in range(height)]
+    forwards_diagonal = [[] for _ in range(height + width - 1)]
+    backwards_diagonal = [[] for _ in range(len(forwards_diagonal))]
+    min_backwards_diagonal = -height + 1
 
-    for x in range(max_col):
-        for y in range(max_row):
-            cols[x].append(input[y][x])
-            rows[y].append(input[y][x])
-            forward_diagonal[x + y].append(input[y][x])
-            backwards_diagonal[x - y - min_backwards_diagonal].append(input[y][x])
+    for x, y in itertools.product(range(width), range(height)):
+        columns[x].append(input[y][x])
+        rows[y].append(input[y][x])
+        forwards_diagonal[x + y].append(input[y][x])
+        backwards_diagonal[x - y - min_backwards_diagonal].append(input[y][x])
 
     return sum(
-        [count_xmas(col) for col in cols]
+        [count_xmas(col) for col in columns]
         + [count_xmas(row) for row in rows]
-        + [count_xmas(diagonal) for diagonal in forward_diagonal]
+        + [count_xmas(diagonal) for diagonal in forwards_diagonal]
         + [count_xmas(diagonal) for diagonal in backwards_diagonal]
     )
 
@@ -48,7 +44,7 @@ def part_2(input):
     width = len(input)
     height = len(input[0])
     blocks = []
-    for row_idx, col_idx in itertools.product(range(1, height), range(1, width)):
+    for row_idx, col_idx in itertools.product(range(height), range(width)):
         block = [
             row[col_idx - 1 : col_idx + 2] for row in input[row_idx - 1 : row_idx + 2]
         ]
