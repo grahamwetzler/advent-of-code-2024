@@ -2,7 +2,6 @@ import re
 from copy import deepcopy
 from itertools import product, zip_longest
 from pathlib import Path
-from time import time
 
 input_text = (Path(__file__).parent / Path("input.txt")).read_text()
 
@@ -11,14 +10,12 @@ input = [
 ]
 
 
-def handle_operation(num_1, num_2, operator):
-    if operator == "||":
-        return int(f"{num_1}{num_2}")
-
-    return eval(f"{num_1} {operator} {num_2}")
-
-
 def solve_line(line, calibration, operators):
+    ops = {
+        "*": lambda a, b: a * b,
+        "+": lambda a, b: a + b,
+        "||": lambda a, b: int(f"{a}{b}"),
+    }
     num_operators = len(line) - 1
     for operator_combination in product(operators, repeat=num_operators):
         equations = zip_longest(line, operator_combination)
@@ -26,14 +23,13 @@ def solve_line(line, calibration, operators):
         result = 0
         index = 3
         while flattened_equations:
-            operate = flattened_equations[:index]
-            del flattened_equations[:index]
+            operate = [flattened_equations.pop(0) for _ in range(index)]
             if len(operate) == 3:
                 num_1, operator, num_2 = operate
-                result += handle_operation(num_1, num_2, operator)
+                result += ops[operator](num_1, num_2)
             else:
                 operator, num_2 = operate
-                result = handle_operation(result, num_2, operator)
+                result = ops[operator](result, num_2)
             index = 2
 
         if result == calibration:
@@ -44,15 +40,12 @@ def solve_line(line, calibration, operators):
 
 def solve_part(input, part):
     operators = {1: ("+", "*"), 2: ("+", "*", "||")}[part]
-    start_time = time()
     calibration_total = 0
     for line in deepcopy(input):
         calibration = line.pop(0)
         if solve_line(line, calibration, operators):
             calibration_total += calibration
-    total_time = time() - start_time
 
-    print(f"took {total_time:.0f} seconds")
     return calibration_total
 
 
